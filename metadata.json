@@ -1,0 +1,7 @@
+{
+  "name": "OwnAI",
+  "description": "BYOK AI Coding Agent Platform with dynamic multi-model routing, isolated sandbox execution, and professional IDE workspace.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
