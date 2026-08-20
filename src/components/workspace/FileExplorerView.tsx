@@ -98,15 +98,15 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
 
   const getFileIcon = (fileName: string) => {
     if (fileName.endsWith('.tsx') || fileName.endsWith('.jsx') || fileName.endsWith('.ts') || fileName.endsWith('.js')) {
-      return <FileCode className="w-4 h-4 text-blue-400 flex-shrink-0" />;
+      return <FileCode className="w-4 h-4 text-zinc-200 flex-shrink-0" />;
     }
     if (fileName.endsWith('.json')) {
-      return <FileJson className="w-4 h-4 text-amber-400 flex-shrink-0" />;
+      return <FileJson className="w-4 h-4 text-zinc-300 flex-shrink-0" />;
     }
     if (fileName.endsWith('.md')) {
-      return <FileText className="w-4 h-4 text-emerald-400 flex-shrink-0" />;
+      return <FileText className="w-4 h-4 text-zinc-400 flex-shrink-0" />;
     }
-    return <FileCode className="w-4 h-4 text-slate-400 flex-shrink-0" />;
+    return <FileCode className="w-4 h-4 text-zinc-500 flex-shrink-0" />;
   };
 
   const handleCreateNewFileSubmit = (e: React.FormEvent) => {
@@ -152,18 +152,18 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
               <div key={item.fullPath} className="flex flex-col">
                 <button
                   onClick={() => toggleFolder(item.fullPath)}
-                  className="flex items-center gap-1.5 py-1 px-2 hover:bg-slate-800/60 rounded text-left text-xs font-mono text-slate-300 hover:text-white transition-colors group"
+                  className="flex items-center gap-1.5 py-2 px-2 hover:bg-zinc-900 rounded-lg text-left text-xs font-mono text-zinc-300 hover:text-white transition-colors group min-h-[36px]"
                   style={{ paddingLeft: `${depth * 12 + 8}px` }}
                 >
                   {isCollapsed ? (
-                    <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+                    <ChevronRight className="w-3.5 h-3.5 text-zinc-500" />
                   ) : (
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                    <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
                   )}
                   {isCollapsed ? (
-                    <Folder className="w-4 h-4 text-blue-400/80" />
+                    <Folder className="w-4 h-4 text-zinc-400" />
                   ) : (
-                    <FolderOpen className="w-4 h-4 text-blue-400" />
+                    <FolderOpen className="w-4 h-4 text-white" />
                   )}
                   <span className="truncate">{item.name}</span>
                 </button>
@@ -179,10 +179,10 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
           return (
             <div
               key={file.path}
-              className={`group flex items-center justify-between py-1 px-2 rounded cursor-pointer text-xs font-mono transition-colors ${
+              className={`group flex items-center justify-between py-2 px-2.5 rounded-lg cursor-pointer text-xs font-mono transition-colors min-h-[36px] ${
                 isSelected
-                  ? 'bg-blue-600/20 text-blue-300 border-l-2 border-blue-500'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                  ? 'bg-white text-black font-semibold shadow-sm'
+                  : 'text-zinc-300 hover:text-white hover:bg-zinc-900'
               }`}
               style={{ paddingLeft: `${depth * 12 + 20}px` }}
               onClick={() => onSelectFile(file.path)}
@@ -191,19 +191,19 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
                 {getFileIcon(file.name)}
                 <span className="truncate">{file.name}</span>
                 {isModified && (
-                  <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" title="Modified" />
+                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isSelected ? 'bg-black' : 'bg-white'}`} title="Modified" />
                 )}
               </div>
 
               {/* Action buttons on hover */}
-              <div className="hidden group-hover:flex items-center gap-1 opacity-80 hover:opacity-100">
+              <div className="flex items-center gap-1 opacity-80 hover:opacity-100">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setRenameTarget(file);
                     setRenameVal(file.path);
                   }}
-                  className="p-1 hover:text-blue-400 rounded"
+                  className={`p-1 rounded ${isSelected ? 'hover:bg-zinc-200 text-black' : 'hover:bg-zinc-800 text-zinc-400 hover:text-white'}`}
                   title="Rename"
                 >
                   <Edit2 className="w-3 h-3" />
@@ -213,7 +213,7 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
                     e.stopPropagation();
                     onDuplicateFile(file.path);
                   }}
-                  className="p-1 hover:text-emerald-400 rounded"
+                  className={`p-1 rounded ${isSelected ? 'hover:bg-zinc-200 text-black' : 'hover:bg-zinc-800 text-zinc-400 hover:text-white'}`}
                   title="Duplicate"
                 >
                   <Copy className="w-3 h-3" />
@@ -225,7 +225,7 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
                       onDeleteFile(file.path);
                     }
                   }}
-                  className="p-1 hover:text-rose-400 rounded"
+                  className={`p-1 rounded ${isSelected ? 'hover:bg-zinc-200 text-black' : 'hover:bg-zinc-800 text-zinc-400 hover:text-white'}`}
                   title="Delete"
                 >
                   <Trash2 className="w-3 h-3" />
@@ -239,11 +239,11 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-slate-950 border-r border-slate-800/80 select-none">
+    <div className="h-full flex flex-col bg-zinc-950 border-r border-zinc-800/80 select-none">
       {/* Header & New Actions */}
-      <div className="p-3 border-b border-slate-800/80 flex items-center justify-between">
-        <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
-          Explorer
+      <div className="p-3 border-b border-zinc-800/80 flex items-center justify-between">
+        <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400">
+          File Tree
         </span>
         <div className="flex items-center gap-1">
           <button
@@ -252,11 +252,11 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
               setNewFolderNameInputOpen(false);
               setInputVal('');
             }}
-            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 rounded-md hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors border border-transparent hover:border-zinc-800"
             title="New File"
             id="btn-new-file"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-4 h-4" />
           </button>
           <button
             onClick={() => {
@@ -264,52 +264,52 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
               setNewFileInputOpen(false);
               setInputVal('');
             }}
-            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 rounded-md hover:bg-zinc-900 text-zinc-400 hover:text-white transition-colors border border-transparent hover:border-zinc-800"
             title="New Folder"
             id="btn-new-folder"
           >
-            <FolderPlus className="w-3.5 h-3.5" />
+            <FolderPlus className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className="p-2 border-b border-slate-800/80">
+      <div className="p-2 border-b border-zinc-800/80">
         <div className="relative">
-          <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-2.5 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search files..."
-            className="w-full bg-slate-900 border border-slate-800 rounded pl-8 pr-3 py-1 text-xs font-mono text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+            placeholder="Filter files..."
+            className="w-full bg-zinc-900 border border-zinc-800 rounded-md pl-8 pr-3 py-1.5 text-xs font-mono text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
           />
         </div>
       </div>
 
       {/* Inline Create Input */}
       {newFileInputOpen && (
-        <form onSubmit={handleCreateNewFileSubmit} className="p-2 bg-slate-900/90 border-b border-slate-800">
-          <div className="text-[10px] font-mono text-slate-400 mb-1">New File Path:</div>
+        <form onSubmit={handleCreateNewFileSubmit} className="p-2.5 bg-zinc-900 border-b border-zinc-800">
+          <div className="text-[10px] font-mono text-zinc-400 mb-1">New File Path:</div>
           <input
             type="text"
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value)}
             placeholder="e.g. components/Card.tsx"
             autoFocus
-            className="w-full bg-slate-950 border border-blue-500 rounded px-2 py-1 text-xs font-mono text-white focus:outline-none"
+            className="w-full bg-zinc-950 border border-zinc-600 rounded px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-white"
           />
-          <div className="flex justify-end gap-1 mt-1.5">
+          <div className="flex justify-end gap-1.5 mt-2">
             <button
               type="button"
               onClick={() => setNewFileInputOpen(false)}
-              className="px-2 py-0.5 text-[10px] text-slate-400 hover:text-white"
+              className="px-2.5 py-1 text-[11px] text-zinc-400 hover:text-white"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-2 py-0.5 text-[10px] bg-blue-600 text-white rounded hover:bg-blue-500"
+              className="px-3 py-1 text-[11px] bg-white text-black font-semibold rounded hover:bg-zinc-200"
             >
               Create
             </button>
@@ -318,27 +318,27 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
       )}
 
       {newFolderNameInputOpen && (
-        <form onSubmit={handleCreateNewFolderSubmit} className="p-2 bg-slate-900/90 border-b border-slate-800">
-          <div className="text-[10px] font-mono text-slate-400 mb-1">New Folder Name:</div>
+        <form onSubmit={handleCreateNewFolderSubmit} className="p-2.5 bg-zinc-900 border-b border-zinc-800">
+          <div className="text-[10px] font-mono text-zinc-400 mb-1">New Folder Name:</div>
           <input
             type="text"
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value)}
             placeholder="e.g. lib/utils"
             autoFocus
-            className="w-full bg-slate-950 border border-blue-500 rounded px-2 py-1 text-xs font-mono text-white focus:outline-none"
+            className="w-full bg-zinc-950 border border-zinc-600 rounded px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-white"
           />
-          <div className="flex justify-end gap-1 mt-1.5">
+          <div className="flex justify-end gap-1.5 mt-2">
             <button
               type="button"
               onClick={() => setNewFolderNameInputOpen(false)}
-              className="px-2 py-0.5 text-[10px] text-slate-400 hover:text-white"
+              className="px-2.5 py-1 text-[11px] text-zinc-400 hover:text-white"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-2 py-0.5 text-[10px] bg-blue-600 text-white rounded hover:bg-blue-500"
+              className="px-3 py-1 text-[11px] bg-white text-black font-semibold rounded hover:bg-zinc-200"
             >
               Add Folder
             </button>
@@ -347,26 +347,26 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
       )}
 
       {renameTarget && (
-        <form onSubmit={handleRenameSubmit} className="p-2 bg-slate-900/90 border-b border-slate-800">
-          <div className="text-[10px] font-mono text-slate-400 mb-1">Rename File:</div>
+        <form onSubmit={handleRenameSubmit} className="p-2.5 bg-zinc-900 border-b border-zinc-800">
+          <div className="text-[10px] font-mono text-zinc-400 mb-1">Rename File:</div>
           <input
             type="text"
             value={renameVal}
             onChange={(e) => setRenameVal(e.target.value)}
             autoFocus
-            className="w-full bg-slate-950 border border-blue-500 rounded px-2 py-1 text-xs font-mono text-white focus:outline-none"
+            className="w-full bg-zinc-950 border border-zinc-600 rounded px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-white"
           />
-          <div className="flex justify-end gap-1 mt-1.5">
+          <div className="flex justify-end gap-1.5 mt-2">
             <button
               type="button"
               onClick={() => setRenameTarget(null)}
-              className="px-2 py-0.5 text-[10px] text-slate-400 hover:text-white"
+              className="px-2.5 py-1 text-[11px] text-zinc-400 hover:text-white"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-2 py-0.5 text-[10px] bg-blue-600 text-white rounded hover:bg-blue-500"
+              className="px-3 py-1 text-[11px] bg-white text-black font-semibold rounded hover:bg-zinc-200"
             >
               Rename
             </button>
@@ -375,9 +375,9 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
       )}
 
       {/* File Tree List */}
-      <div className="flex-1 overflow-y-auto p-1 py-2">
+      <div className="flex-1 overflow-y-auto p-1.5 py-2 space-y-0.5">
         {files.length === 0 ? (
-          <div className="p-4 text-center text-xs text-slate-500 font-mono">
+          <div className="p-4 text-center text-xs text-zinc-500 font-mono">
             No files in project
           </div>
         ) : (
@@ -386,7 +386,7 @@ export const FileExplorerView: React.FC<FileExplorerViewProps> = ({
       </div>
 
       {/* Footer Stats */}
-      <div className="p-2 border-t border-slate-800/80 text-[11px] font-mono text-slate-500 flex justify-between">
+      <div className="p-2.5 border-t border-zinc-800/80 text-[11px] font-mono text-zinc-500 flex justify-between">
         <span>{files.length} files</span>
         <span>{files.reduce((acc, f) => acc + f.linesCount, 0)} lines</span>
       </div>

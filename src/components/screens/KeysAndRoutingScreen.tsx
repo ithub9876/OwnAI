@@ -148,27 +148,27 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
   const sortedRoutes = [...routes].sort((a, b) => a.priority - b.priority);
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-slate-950 text-slate-100 p-6 max-w-6xl mx-auto w-full select-none">
+    <div className="min-h-[calc(100vh-3.5rem)] bg-zinc-950 text-zinc-100 p-4 sm:p-6 max-w-6xl mx-auto w-full select-none">
       {/* Header & Sub-Nav */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-800/80">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 sm:mb-8 pb-5 sm:pb-6 border-b border-zinc-800/80">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
-            <Key className="w-5 h-5 text-blue-400" />
-            <h1 className="text-2xl font-bold tracking-tight text-white font-mono">
+            <Key className="w-5 h-5 text-white" />
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white font-mono">
               AI Routing Matrix &amp; Key Vault
             </h1>
           </div>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-zinc-400">
             Configure BYOK API providers, prioritize fallback execution chains, and inspect failover logs.
           </p>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800 self-start md:self-auto">
+        <div className="flex items-center gap-1 bg-zinc-900 p-1 rounded-lg border border-zinc-800 self-start md:self-auto overflow-x-auto max-w-full">
           <button
             onClick={() => setActiveTab('ROUTES')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono font-medium transition-colors ${
-              activeTab === 'ROUTES' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono font-medium transition-colors whitespace-nowrap ${
+              activeTab === 'ROUTES' ? 'bg-white text-black font-semibold shadow-sm' : 'text-zinc-400 hover:text-white'
             }`}
             id="tab-routes"
           >
@@ -178,8 +178,8 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
 
           <button
             onClick={() => setActiveTab('KEYS')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono font-medium transition-colors ${
-              activeTab === 'KEYS' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono font-medium transition-colors whitespace-nowrap ${
+              activeTab === 'KEYS' ? 'bg-white text-black font-semibold shadow-sm' : 'text-zinc-400 hover:text-white'
             }`}
             id="tab-keys"
           >
@@ -189,12 +189,12 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
 
           <button
             onClick={() => setActiveTab('SIMULATOR')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono font-medium transition-colors ${
-              activeTab === 'SIMULATOR' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono font-medium transition-colors whitespace-nowrap ${
+              activeTab === 'SIMULATOR' ? 'bg-white text-black font-semibold shadow-sm' : 'text-zinc-400 hover:text-white'
             }`}
             id="tab-simulator"
           >
-            <Activity className="w-3.5 h-3.5 text-amber-400" />
+            <Activity className="w-3.5 h-3.5" />
             <span>Failover Simulator</span>
           </button>
         </div>
@@ -203,17 +203,17 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
       {/* TAB 1: PRIORITY ROUTING MATRIX */}
       {activeTab === 'ROUTES' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-bold text-white font-mono">Priority Execution Cascade</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                The agent attempts routes in descending order. If a model encounters a 429 rate limit or 500 error, it automatically falls back to Priority N+1.
+              <p className="text-xs text-zinc-400 mt-0.5">
+                The agent attempts routes in descending order. If a model encounters a rate limit or error, it automatically falls back to Priority N+1.
               </p>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsAddRouteModalOpen(true)}
-                className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-medium transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-2 rounded-lg bg-white hover:bg-zinc-200 text-black text-xs font-mono font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
                 id="btn-add-route"
               >
                 <Plus className="w-3.5 h-3.5" /> Add Route
@@ -232,32 +232,32 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
                   key={route.id}
                   className={`p-4 rounded-xl border transition-all ${
                     route.isEnabled
-                      ? 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
-                      : 'bg-slate-950/40 border-slate-900 opacity-60'
+                      ? 'bg-zinc-900/70 border-zinc-800 hover:border-zinc-700'
+                      : 'bg-zinc-950/40 border-zinc-900 opacity-60'
                   }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     {/* Priority & Name */}
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-slate-950 border border-slate-800 font-mono font-bold text-xs text-blue-400 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-zinc-950 border border-zinc-800 font-mono font-bold text-xs text-white flex items-center justify-center">
                         P{route.priority}
                       </div>
                       <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-mono font-bold text-sm text-slate-100">{route.name}</h3>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded uppercase bg-slate-800 text-slate-300">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-mono font-bold text-sm text-zinc-100">{route.name}</h3>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded uppercase bg-zinc-800 text-zinc-300 border border-zinc-700">
                             {route.provider}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 mt-1 text-xs font-mono text-slate-400">
-                          <span>Model: <code className="text-slate-200">{route.modelId}</code></span>
+                        <div className="flex items-center gap-2 mt-1 text-xs font-mono text-zinc-400 flex-wrap">
+                          <span>Model: <code className="text-zinc-200">{route.modelId}</code></span>
                           {route.supportsVision && (
-                            <span className="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20 text-[10px]">
+                            <span className="text-white bg-zinc-800 px-1.5 py-0.2 rounded border border-zinc-700 text-[10px] font-medium">
                               VISION
                             </span>
                           )}
                           {route.supportsTools && (
-                            <span className="text-cyan-400 bg-cyan-500/10 px-1.5 py-0.2 rounded border border-cyan-500/20 text-[10px]">
+                            <span className="text-white bg-zinc-800 px-1.5 py-0.2 rounded border border-zinc-700 text-[10px] font-medium">
                               TOOLS
                             </span>
                           )}
@@ -271,11 +271,11 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
                       {ping && (
                         <div className="text-xs font-mono mr-2">
                           {ping.isSuccess ? (
-                            <span className="text-emerald-400 flex items-center gap-1">
+                            <span className="text-white font-medium flex items-center gap-1">
                               <CheckCircle2 className="w-3.5 h-3.5" /> {ping.latencyMs}ms
                             </span>
                           ) : (
-                            <span className="text-rose-400 flex items-center gap-1" title={ping.errorMessage}>
+                            <span className="text-zinc-400 flex items-center gap-1" title={ping.errorMessage}>
                               <AlertTriangle className="w-3.5 h-3.5" /> Fail
                             </span>
                           )}
@@ -285,7 +285,7 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
                       <button
                         onClick={() => handlePing(route.id)}
                         disabled={isTesting}
-                        className="px-2.5 py-1 rounded bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-xs font-mono transition-colors disabled:opacity-50"
+                        className="px-2.5 py-1.5 rounded bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white text-xs font-mono transition-colors disabled:opacity-50"
                         title="Test route latency"
                       >
                         {isTesting ? 'Pinging...' : 'Ping'}
@@ -295,7 +295,7 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
                       <button
                         onClick={() => onMovePriority(route.id, true)}
                         disabled={index === 0}
-                        className="p-1 rounded bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white disabled:opacity-30 transition-colors"
+                        className="p-1.5 rounded bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 transition-colors"
                         title="Increase Priority"
                       >
                         <ArrowUp className="w-3.5 h-3.5" />
@@ -303,7 +303,7 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
                       <button
                         onClick={() => onMovePriority(route.id, false)}
                         disabled={index === sortedRoutes.length - 1}
-                        className="p-1 rounded bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white disabled:opacity-30 transition-colors"
+                        className="p-1.5 rounded bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 transition-colors"
                         title="Decrease Priority"
                       >
                         <ArrowDown className="w-3.5 h-3.5" />
@@ -314,8 +314,8 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
                         onClick={() => onToggleRoute(route)}
                         className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
                           route.isEnabled
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-slate-800 text-slate-500'
+                            ? 'bg-zinc-800 text-white border border-zinc-700 font-medium'
+                            : 'bg-zinc-950 text-zinc-600 border border-zinc-900'
                         }`}
                       >
                         {route.isEnabled ? 'Enabled' : 'Disabled'}
@@ -323,7 +323,7 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
 
                       <button
                         onClick={() => onDeleteRoute(route.id)}
-                        className="p-1 text-slate-500 hover:text-rose-400 rounded transition-colors"
+                        className="p-1.5 text-zinc-500 hover:text-white rounded transition-colors"
                         title="Delete Route"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -340,16 +340,16 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
       {/* TAB 2: KEY VAULT */}
       {activeTab === 'KEYS' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-bold text-white font-mono">Encrypted BYOK Key Vault</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-zinc-400 mt-0.5">
                 All credentials encrypted in browser via AES-256-GCM. Never sent to central servers.
               </p>
             </div>
             <button
               onClick={() => setIsAddKeyModalOpen(true)}
-              className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-medium transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-lg bg-white hover:bg-zinc-200 text-black text-xs font-mono font-semibold transition-colors flex items-center gap-1.5 shadow-sm self-start sm:self-auto"
               id="btn-add-key"
             >
               <Plus className="w-3.5 h-3.5" /> Add API Key
@@ -360,46 +360,46 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
             {apiKeys.map((key) => (
               <div
                 key={key.id}
-                className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:border-slate-700 transition-all flex flex-col justify-between"
+                className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-emerald-400" />
-                      <h3 className="font-mono font-bold text-sm text-slate-100">{key.name}</h3>
+                      <Lock className="w-4 h-4 text-white" />
+                      <h3 className="font-mono font-bold text-sm text-zinc-100">{key.name}</h3>
                     </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded uppercase bg-slate-800 text-slate-300">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded uppercase bg-zinc-800 text-zinc-300 border border-zinc-700">
                       {key.provider}
                     </span>
                   </div>
 
-                  <div className="space-y-1.5 text-xs font-mono text-slate-400 my-3">
+                  <div className="space-y-1.5 text-xs font-mono text-zinc-400 my-3">
                     <div className="flex items-center justify-between">
                       <span>Masked Key:</span>
-                      <code className="text-slate-200 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                      <code className="text-zinc-200 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800">
                         {key.maskedKey}
                       </code>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Encryption:</span>
-                      <span className="text-emerald-400">AES-256-GCM (Local)</span>
+                      <span className="text-zinc-300">AES-256-GCM (Local)</span>
                     </div>
                     {key.baseUrl && (
                       <div className="flex items-center justify-between">
                         <span>Base URL:</span>
-                        <span className="text-slate-300 truncate max-w-[180px]">{key.baseUrl}</span>
+                        <span className="text-zinc-300 truncate max-w-[180px]">{key.baseUrl}</span>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Status: {key.status}
+                <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-zinc-300 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-white" /> Status: {key.status}
                   </span>
                   <button
                     onClick={() => onDeleteApiKey(key.id)}
-                    className="text-slate-500 hover:text-rose-400 text-xs font-mono flex items-center gap-1 transition-colors"
+                    className="text-zinc-500 hover:text-white text-xs font-mono flex items-center gap-1 transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" /> Remove
                   </button>
@@ -413,14 +413,14 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
       {/* TAB 3: MULTI-ROUTE FAILOVER SIMULATOR */}
       {activeTab === 'SIMULATOR' && (
         <div className="space-y-6">
-          <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/40">
+          <div className="p-5 sm:p-6 rounded-xl border border-zinc-800 bg-zinc-900/60">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
                 <h2 className="text-lg font-bold text-white font-mono flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-amber-400" />
+                  <Activity className="w-5 h-5 text-white" />
                   Dynamic 429 Failover Simulator
                 </h2>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-zinc-400 mt-1">
                   Inject simulated Rate Limit (HTTP 429) errors into Primary Route (P1) to verify automatic agent failover to Secondary Route (P2).
                 </p>
               </div>
@@ -428,7 +428,7 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
               <button
                 onClick={handleRunSimulator}
                 disabled={isSimulating}
-                className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-mono font-medium transition-colors flex items-center gap-2 shadow-lg shadow-amber-600/20 disabled:opacity-50"
+                className="px-4 py-2.5 rounded-lg bg-white hover:bg-zinc-200 text-black text-xs font-mono font-semibold transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 self-start sm:self-auto"
               >
                 <Play className="w-4 h-4" />
                 {isSimulating ? 'Simulating Failover...' : 'Trigger Fallback Test'}
@@ -436,16 +436,16 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
             </div>
 
             {/* Simulation Log Feed */}
-            <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs space-y-3 min-h-[160px]">
+            <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 font-mono text-xs space-y-3 min-h-[160px]">
               {simulationLogs.length === 0 && !isSimulating && (
-                <div className="text-center py-8 text-slate-500">
+                <div className="text-center py-8 text-zinc-500">
                   Click "Trigger Fallback Test" to run real-time multi-route failover diagnostics.
                 </div>
               )}
 
               {isSimulating && simulationLogs.length === 0 && (
-                <div className="flex items-center gap-2 text-amber-400">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                <div className="flex items-center gap-2 text-zinc-300">
+                  <span className="w-2 h-2 rounded-full bg-white animate-ping" />
                   <span>Dispatching prompt to Route 1 (Priority 1)... Injecting HTTP 429...</span>
                 </div>
               )}
@@ -455,8 +455,8 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
                   key={idx}
                   className={`p-3 rounded-lg border leading-relaxed ${
                     log.isSuccess
-                      ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-300'
-                      : 'bg-rose-950/30 border-rose-500/40 text-rose-300'
+                      ? 'bg-zinc-900 border-zinc-700 text-zinc-100'
+                      : 'bg-zinc-900/60 border-zinc-800 text-zinc-400'
                   }`}
                 >
                   <div className="flex items-center justify-between font-bold mb-1">
@@ -464,7 +464,7 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
                       {log.isSuccess ? '✓ SUCCESS: ' : '✗ FAILED (Failover Triggered): '}
                       {log.routeName}
                     </span>
-                    <span className="text-[10px]">
+                    <span className="text-[10px] text-zinc-400">
                       HTTP {log.statusCode} • {log.latencyMs}ms
                     </span>
                   </div>
@@ -478,28 +478,28 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
 
       {/* Add Route Modal */}
       {isAddRouteModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 className="text-lg font-bold font-mono text-white mb-4">Configure New AI Route</h3>
 
             <form onSubmit={handleAddRouteSubmit} className="space-y-4 text-xs font-mono">
               <div>
-                <label className="text-slate-400 block mb-1">Route Name (optional)</label>
+                <label className="text-zinc-400 block mb-1">Route Name (optional)</label>
                 <input
                   type="text"
                   value={routeName}
                   onChange={(e) => setRouteName(e.target.value)}
                   placeholder="e.g. NVIDIA NIM DeepSeek"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-zinc-500"
                 />
               </div>
 
               <div>
-                <label className="text-slate-400 block mb-1">Provider</label>
+                <label className="text-zinc-400 block mb-1">Provider</label>
                 <select
                   value={routeProvider}
                   onChange={(e) => setRouteProvider(e.target.value as ModelProviderType)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-zinc-500"
                 >
                   <option value="nvidia">NVIDIA NIM</option>
                   <option value="anthropic">Anthropic Claude</option>
@@ -512,14 +512,14 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
               </div>
 
               <div>
-                <label className="text-slate-400 block mb-1">Model Identifier</label>
+                <label className="text-zinc-400 block mb-1">Model Identifier</label>
                 <input
                   type="text"
                   value={routeModelId}
                   onChange={(e) => setRouteModelId(e.target.value)}
                   placeholder="e.g. deepseek-ai/deepseek-r1 or claude-3-5-sonnet-20241022"
                   required
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-zinc-500"
                 />
               </div>
 
@@ -529,9 +529,9 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
                     type="checkbox"
                     checked={routeVision}
                     onChange={(e) => setRouteVision(e.target.checked)}
-                    className="rounded bg-slate-950 border-slate-800 text-blue-600 focus:ring-0"
+                    className="rounded bg-zinc-950 border-zinc-800 text-white focus:ring-0"
                   />
-                  <span className="text-slate-300">Vision Support</span>
+                  <span className="text-zinc-300">Vision Support</span>
                 </label>
 
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -539,23 +539,23 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
                     type="checkbox"
                     checked={routeTools}
                     onChange={(e) => setRouteTools(e.target.checked)}
-                    className="rounded bg-slate-950 border-slate-800 text-blue-600 focus:ring-0"
+                    className="rounded bg-zinc-950 border-zinc-800 text-white focus:ring-0"
                   />
-                  <span className="text-slate-300">Tool Calling</span>
+                  <span className="text-zinc-300">Tool Calling</span>
                 </label>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setIsAddRouteModalOpen(false)}
-                  className="px-4 py-2 rounded-lg text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-lg text-zinc-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium"
+                  className="px-4 py-2 bg-white hover:bg-zinc-200 text-black font-semibold rounded-lg"
                 >
                   Save Route
                 </button>
@@ -567,28 +567,28 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
 
       {/* Add API Key Modal */}
       {isAddKeyModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 className="text-lg font-bold font-mono text-white mb-4">Add BYOK API Key</h3>
 
             <form onSubmit={handleAddKeySubmit} className="space-y-4 text-xs font-mono">
               <div>
-                <label className="text-slate-400 block mb-1">Key Label (optional)</label>
+                <label className="text-zinc-400 block mb-1">Key Label (optional)</label>
                 <input
                   type="text"
                   value={keyName}
                   onChange={(e) => setKeyName(e.target.value)}
                   placeholder="e.g. Anthropic Production Key"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-zinc-500"
                 />
               </div>
 
               <div>
-                <label className="text-slate-400 block mb-1">Provider</label>
+                <label className="text-zinc-400 block mb-1">Provider</label>
                 <select
                   value={keyProvider}
                   onChange={(e) => setKeyProvider(e.target.value as ModelProviderType)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-zinc-500"
                 >
                   <option value="nvidia">NVIDIA NIM</option>
                   <option value="anthropic">Anthropic Claude</option>
@@ -601,42 +601,42 @@ export const KeysAndRoutingScreen: React.FC<KeysAndRoutingScreenProps> = ({
               </div>
 
               <div>
-                <label className="text-slate-400 block mb-1">API Key (Raw Value)</label>
+                <label className="text-zinc-400 block mb-1">API Key (Raw Value)</label>
                 <input
                   type="password"
                   value={rawKeyInput}
                   onChange={(e) => setRawKeyInput(e.target.value)}
                   placeholder="sk-... or nvapi-..."
                   required
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500 font-mono"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-zinc-500 font-mono"
                 />
-                <p className="text-[10px] text-slate-500 mt-1">
+                <p className="text-[10px] text-zinc-500 mt-1">
                   🔒 Key will be immediately encrypted with AES-256-GCM before storage.
                 </p>
               </div>
 
               <div>
-                <label className="text-slate-400 block mb-1">Custom Base URL (optional)</label>
+                <label className="text-zinc-400 block mb-1">Custom Base URL (optional)</label>
                 <input
                   type="text"
                   value={keyBaseUrl}
                   onChange={(e) => setKeyBaseUrl(e.target.value)}
                   placeholder="e.g. http://localhost:11434/v1"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-zinc-500"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setIsAddKeyModalOpen(false)}
-                  className="px-4 py-2 rounded-lg text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-lg text-zinc-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium"
+                  className="px-4 py-2 bg-white hover:bg-zinc-200 text-black font-semibold rounded-lg"
                 >
                   Encrypt &amp; Save Key
                 </button>

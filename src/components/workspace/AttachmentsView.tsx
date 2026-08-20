@@ -44,14 +44,14 @@ export const AttachmentsView: React.FC<AttachmentsViewProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-slate-950 text-slate-200 select-none text-xs">
+    <div className="h-full flex flex-col bg-zinc-950 text-zinc-200 select-none text-xs">
       {/* Header */}
-      <div className="p-3 bg-slate-900 border-b border-slate-800/80 flex items-center justify-between">
+      <div className="p-3 bg-zinc-900 border-b border-zinc-800/80 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Upload className="w-4 h-4 text-blue-400" />
-          <span className="font-mono font-bold text-slate-100">Project Attachments & Context</span>
+          <Upload className="w-4 h-4 text-zinc-300" />
+          <span className="font-mono font-bold text-zinc-100">Project Attachments</span>
         </div>
-        <label className="cursor-pointer px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-medium flex items-center gap-1.5 transition-colors">
+        <label className="cursor-pointer px-2.5 py-1.5 rounded-md bg-white hover:bg-zinc-200 text-black font-semibold flex items-center gap-1.5 transition-colors shadow-sm text-xs">
           <Plus className="w-3.5 h-3.5" /> Upload Asset
           <input
             type="file"
@@ -65,13 +65,13 @@ export const AttachmentsView: React.FC<AttachmentsViewProps> = ({
       {/* Upload Zone / List */}
       <div className="flex-1 p-4 overflow-y-auto space-y-3">
         {attachments.length === 0 ? (
-          <div className="border-2 border-dashed border-slate-800 rounded-xl p-8 text-center flex flex-col items-center justify-center">
-            <Upload className="w-8 h-8 text-slate-600 mb-2" />
-            <p className="font-medium text-slate-400">No attachments in workspace context</p>
-            <p className="text-[11px] text-slate-600 mt-1 max-w-xs">
+          <div className="border-2 border-dashed border-zinc-800 rounded-xl p-8 text-center flex flex-col items-center justify-center">
+            <Upload className="w-8 h-8 text-zinc-600 mb-2" />
+            <p className="font-medium text-zinc-300">No attachments in workspace context</p>
+            <p className="text-[11px] text-zinc-500 mt-1 max-w-xs">
               Upload UI mockups, architectural specifications, or database schemas for multimodal AI vision analysis.
             </p>
-            <label className="mt-4 cursor-pointer px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 font-medium transition-colors">
+            <label className="mt-4 cursor-pointer px-3.5 py-2 rounded-lg border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 font-medium transition-colors">
               Select local file
               <input
                 type="file"
@@ -86,22 +86,22 @@ export const AttachmentsView: React.FC<AttachmentsViewProps> = ({
             {attachments.map((att) => (
               <div
                 key={att.id}
-                className="p-3 rounded-lg bg-slate-900 border border-slate-800 flex items-start justify-between group hover:border-slate-700 transition-colors"
+                className="p-3 rounded-lg bg-zinc-900 border border-zinc-800 flex items-start justify-between group hover:border-zinc-700 transition-colors"
               >
                 <div className="flex items-start gap-2.5">
                   {att.isVisionSupported ? (
-                    <ImageIcon className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <ImageIcon className="w-5 h-5 text-white flex-shrink-0 mt-0.5" />
                   ) : (
-                    <File className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                    <File className="w-5 h-5 text-zinc-400 flex-shrink-0 mt-0.5" />
                   )}
                   <div>
-                    <h4 className="font-mono text-slate-200 font-medium truncate max-w-[160px]">
+                    <h4 className="font-mono text-zinc-200 font-medium truncate max-w-[160px]">
                       {att.name}
                     </h4>
-                    <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono mt-1">
+                    <div className="flex items-center gap-2 text-[10px] text-zinc-400 font-mono mt-1">
                       <span>{(att.sizeBytes / 1024).toFixed(1)} KB</span>
                       {att.isVisionSupported && (
-                        <span className="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
+                        <span className="text-white bg-zinc-800 px-1.5 py-0.2 rounded border border-zinc-700 font-semibold">
                           VISION
                         </span>
                       )}
@@ -111,7 +111,7 @@ export const AttachmentsView: React.FC<AttachmentsViewProps> = ({
 
                 <button
                   onClick={() => onDeleteAttachment(att.id)}
-                  className="p-1 text-slate-500 hover:text-rose-400 rounded transition-colors"
+                  className="p-1 text-zinc-500 hover:text-white rounded transition-colors"
                   title="Remove attachment"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -123,7 +123,7 @@ export const AttachmentsView: React.FC<AttachmentsViewProps> = ({
       </div>
 
       {/* Footer Info */}
-      <div className="h-7 bg-slate-900 border-t border-slate-800 px-4 flex items-center justify-between text-[11px] font-mono text-slate-500">
+      <div className="h-7 bg-zinc-900 border-t border-zinc-800 px-4 flex items-center justify-between text-[11px] font-mono text-zinc-500">
         <span>Multimodal Vision Context for Claude 3.5 & GPT-4o</span>
         <span>Local Encrypted Storage</span>
       </div>

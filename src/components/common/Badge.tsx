@@ -2,7 +2,7 @@ import React from 'react';
 
 interface BadgeProps {
   text: string;
-  variant?: 'default' | 'success' | 'warning' | 'error' | 'cyan' | 'purple';
+  variant?: 'default' | 'success' | 'warning' | 'error' | 'cyan' | 'purple' | 'white' | 'inverted' | 'subtle';
   size?: 'sm' | 'md';
   className?: string;
 }
@@ -14,12 +14,15 @@ export const Badge: React.FC<BadgeProps> = ({
   className = ''
 }) => {
   const variantStyles = {
-    default: 'bg-slate-800/80 text-blue-400 border-slate-700/60',
-    success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-    warning: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-    error: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
-    cyan: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30',
-    purple: 'bg-purple-500/10 text-purple-400 border-purple-500/30'
+    default: 'bg-zinc-900/90 text-zinc-200 border-zinc-800',
+    white: 'bg-white text-black font-bold border-white shadow-sm',
+    inverted: 'bg-zinc-800 text-zinc-100 border-zinc-700',
+    subtle: 'bg-zinc-950 text-zinc-400 border-zinc-800/80',
+    success: 'bg-zinc-900 text-zinc-100 border-zinc-700',
+    warning: 'bg-zinc-800 text-zinc-200 border-zinc-700',
+    error: 'bg-zinc-900 text-zinc-300 border-zinc-700',
+    cyan: 'bg-zinc-900 text-zinc-100 border-zinc-700',
+    purple: 'bg-zinc-900 text-zinc-200 border-zinc-700'
   };
 
   const sizeStyles = {
@@ -29,9 +32,10 @@ export const Badge: React.FC<BadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center font-mono font-medium rounded border tracking-wide uppercase ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+      className={`inline-flex items-center font-mono font-medium rounded-md border tracking-wide uppercase ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
     >
       {text}
     </span>
   );
 };
+

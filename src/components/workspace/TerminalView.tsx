@@ -57,32 +57,32 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col bg-slate-950 font-mono text-xs select-none">
+    <div className="h-full flex flex-col bg-zinc-950 font-mono text-xs select-none">
       {/* Terminal Top Bar */}
-      <div className="h-10 bg-slate-900 border-b border-slate-800/80 px-4 flex items-center justify-between">
+      <div className="h-10 bg-zinc-900 border-b border-zinc-800/80 px-3 md:px-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <TerminalIcon className="w-4 h-4 text-amber-400" />
-          <span className="font-bold text-slate-200">Sandbox Isolated Shell (v2.4.1)</span>
-          <span className="flex items-center gap-1 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-            <ShieldCheck className="w-3 h-3" /> Zero Host Access
+          <TerminalIcon className="w-4 h-4 text-zinc-300" />
+          <span className="font-bold text-zinc-200">Sandbox Shell (v2.4.1)</span>
+          <span className="hidden sm:flex items-center gap-1 text-[10px] text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700 font-medium">
+            <ShieldCheck className="w-3 h-3 text-white" /> Isolated
           </span>
         </div>
 
         {/* Real-time Hardware Telemetry Gauges */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 text-slate-400">
-            <Cpu className="w-3.5 h-3.5 text-blue-400" />
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-1.5 text-zinc-400 text-[11px]">
+            <Cpu className="w-3.5 h-3.5 text-zinc-300" />
             <span>CPU:</span>
-            <span className="text-slate-200 font-bold">{cpuUsage.toFixed(1)}%</span>
+            <span className="text-white font-bold">{cpuUsage.toFixed(1)}%</span>
           </div>
-          <div className="flex items-center gap-1.5 text-slate-400">
-            <HardDrive className="w-3.5 h-3.5 text-purple-400" />
+          <div className="flex items-center gap-1.5 text-zinc-400 text-[11px]">
+            <HardDrive className="w-3.5 h-3.5 text-zinc-300" />
             <span>RAM:</span>
-            <span className="text-slate-200 font-bold">{ramUsage.toFixed(1)} MB</span>
+            <span className="text-white font-bold">{ramUsage.toFixed(1)} MB</span>
           </div>
           <button
             onClick={onClearTerminal}
-            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+            className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
             title="Clear Terminal"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -91,14 +91,14 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
       </div>
 
       {/* Quick Command Pills */}
-      <div className="bg-slate-950 border-b border-slate-900 px-4 py-1.5 flex items-center gap-1.5 overflow-x-auto">
-        <span className="text-[10px] text-slate-500 uppercase mr-1">Shortcuts:</span>
+      <div className="bg-zinc-950 border-b border-zinc-900 px-3 md:px-4 py-1.5 flex items-center gap-1.5 overflow-x-auto">
+        <span className="text-[10px] text-zinc-500 uppercase mr-1 flex-shrink-0">Shortcuts:</span>
         {quickCommands.map((cmd) => (
           <button
             key={cmd}
             onClick={() => handleQuickCommand(cmd)}
             disabled={isExecuting}
-            className="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white text-[11px] transition-colors whitespace-nowrap disabled:opacity-50"
+            className="px-2.5 py-1 rounded bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white text-[11px] transition-colors whitespace-nowrap disabled:opacity-50 flex-shrink-0"
           >
             {cmd}
           </button>
@@ -106,11 +106,11 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
       </div>
 
       {/* Terminal Output Area */}
-      <div className="flex-1 p-4 overflow-y-auto font-mono text-slate-300 leading-relaxed whitespace-pre-wrap selection:bg-blue-600/60 selection:text-white">
+      <div className="flex-1 p-4 overflow-y-auto font-mono text-zinc-300 leading-relaxed whitespace-pre-wrap selection:bg-zinc-700 selection:text-white">
         {terminalOutput}
         {isExecuting && (
-          <div className="flex items-center gap-2 text-amber-400 mt-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+          <div className="flex items-center gap-2 text-zinc-300 mt-2">
+            <span className="w-2 h-2 rounded-full bg-white animate-ping" />
             <span>Executing command in container sandbox...</span>
           </div>
         )}
@@ -120,21 +120,21 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
       {/* Command Input Prompt Form */}
       <form
         onSubmit={handleSubmit}
-        className="p-3 bg-slate-900/90 border-t border-slate-800/80 flex items-center gap-2"
+        className="p-3 bg-zinc-900/90 border-t border-zinc-800/80 flex items-center gap-2"
       >
-        <span className="text-emerald-400 font-bold select-none">$</span>
+        <span className="text-white font-bold select-none">$</span>
         <input
           type="text"
           value={commandInput}
           onChange={(e) => setCommandInput(e.target.value)}
           placeholder="Type sandbox command (e.g. npm run build, pytest, git status)..."
           disabled={isExecuting}
-          className="flex-1 bg-transparent text-slate-100 placeholder-slate-600 focus:outline-none font-mono text-xs"
+          className="flex-1 bg-transparent text-zinc-100 placeholder-zinc-500 focus:outline-none font-mono text-xs"
         />
         <button
           type="submit"
           disabled={!commandInput.trim() || isExecuting}
-          className="p-1.5 rounded bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 text-white disabled:text-slate-600 transition-colors"
+          className="p-2 rounded bg-white hover:bg-zinc-200 disabled:bg-zinc-900 text-black disabled:text-zinc-600 transition-colors shadow-sm"
           title="Run command"
         >
           <CornerDownLeft className="w-3.5 h-3.5" />

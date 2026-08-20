@@ -69,46 +69,46 @@ export const AgentChatView: React.FC<AgentChatViewProps> = ({
   const getStepBadge = (type: string) => {
     switch (type) {
       case 'PLAN':
-        return <Badge text="PLAN" variant="purple" />;
+        return <Badge text="PLAN" variant="white" />;
       case 'INSPECT':
-        return <Badge text="INSPECT" variant="cyan" />;
+        return <Badge text="INSPECT" variant="inverted" />;
       case 'READ_FILE':
-        return <Badge text="READ" variant="default" />;
+        return <Badge text="READ" variant="subtle" />;
       case 'CREATE_FILE':
       case 'EDIT_FILE':
-        return <Badge text="WRITE" variant="warning" />;
+        return <Badge text="WRITE" variant="white" />;
       case 'RUN_BUILD':
-        return <Badge text="BUILD" variant="cyan" />;
+        return <Badge text="BUILD" variant="inverted" />;
       case 'RUN_TEST':
-        return <Badge text="TEST" variant="success" />;
+        return <Badge text="TEST" variant="white" />;
       case 'VERIFIED':
-        return <Badge text="VERIFIED" variant="success" />;
+        return <Badge text="VERIFIED" variant="inverted" />;
       default:
-        return <Badge text={type} variant="default" />;
+        return <Badge text={type} variant="subtle" />;
     }
   };
 
   return (
-    <div className="h-full flex flex-col bg-slate-950 border-l border-slate-800/80 select-none text-xs">
+    <div className="h-full flex flex-col bg-zinc-950 border-l border-zinc-800/80 select-none text-xs">
       {/* Agent Header */}
-      <div className="p-3 bg-slate-900 border-b border-slate-800/80 flex items-center justify-between">
+      <div className="p-3 bg-zinc-900 border-b border-zinc-800/80 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-blue-600 flex items-center justify-center">
-            <Sparkles className="w-3.5 h-3.5 text-white" />
+          <div className="w-6 h-6 rounded-md bg-white text-black flex items-center justify-center shadow-sm">
+            <Sparkles className="w-3.5 h-3.5 text-black" />
           </div>
           <div>
-            <div className="font-bold font-mono text-slate-100 flex items-center gap-1.5">
+            <div className="font-bold font-mono text-zinc-100 flex items-center gap-1.5">
               Coding Agent
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
             </div>
-            <div className="text-[10px] text-slate-400 font-mono truncate max-w-[170px]">
+            <div className="text-[10px] text-zinc-400 font-mono truncate max-w-[170px]">
               Route: {activeRouteName || 'NVIDIA NIM DeepSeek'}
             </div>
           </div>
         </div>
 
         {isAgentRunning && (
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] font-mono animate-pulse">
+          <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-800 text-white border border-zinc-700 text-[10px] font-mono animate-pulse">
             <Cpu className="w-3 h-3" /> Working
           </span>
         )}
@@ -116,15 +116,15 @@ export const AgentChatView: React.FC<AgentChatViewProps> = ({
 
       {/* Active Autonomous Step Progression Card */}
       {isAgentRunning && (
-        <div className="p-3 bg-blue-950/40 border-b border-blue-900/50">
+        <div className="p-3 bg-zinc-900 border-b border-zinc-800">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-mono text-blue-300 font-semibold uppercase flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
-              Autonomous Pipeline Execution
+            <span className="text-[10px] font-mono text-white font-semibold uppercase flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+              Autonomous Execution Loop
             </span>
-            <span className="text-[10px] font-mono text-blue-400">Step {steps.length + 1}/7</span>
+            <span className="text-[10px] font-mono text-zinc-400">Step {steps.length + 1}/7</span>
           </div>
-          <div className="p-2 rounded bg-slate-950/80 border border-blue-800/40 font-mono text-slate-200 text-[11px] leading-tight">
+          <div className="p-2 rounded bg-zinc-950 border border-zinc-800 font-mono text-zinc-200 text-[11px] leading-tight">
             {currentRunningStep || 'Initializing agent tools & inspecting files...'}
           </div>
         </div>
@@ -132,30 +132,30 @@ export const AgentChatView: React.FC<AgentChatViewProps> = ({
 
       {/* Live Steps Breakdown Accordion */}
       {steps.length > 0 && (
-        <div className="border-b border-slate-800/80 bg-slate-900/40">
+        <div className="border-b border-zinc-800/80 bg-zinc-900/50">
           <button
             onClick={() => setShowStepsList(!showStepsList)}
-            className="w-full px-3 py-1.5 flex items-center justify-between text-slate-400 hover:text-slate-200 text-[11px] font-mono"
+            className="w-full px-3 py-1.5 flex items-center justify-between text-zinc-400 hover:text-zinc-200 text-[11px] font-mono"
           >
             <span className="flex items-center gap-1">
-              <Layers className="w-3 h-3 text-blue-400" />
+              <Layers className="w-3 h-3 text-zinc-300" />
               Execution Steps ({steps.length})
             </span>
             {showStepsList ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </button>
 
           {showStepsList && (
-            <div className="max-h-48 overflow-y-auto p-2 space-y-1.5 border-t border-slate-900">
+            <div className="max-h-48 overflow-y-auto p-2 space-y-1.5 border-t border-zinc-900">
               {steps.map((step, idx) => (
                 <div
                   key={step.id || idx}
-                  className="p-2 rounded bg-slate-950 border border-slate-800/80 flex items-start gap-2 font-mono text-[11px]"
+                  className="p-2 rounded bg-zinc-950 border border-zinc-800/80 flex items-start gap-2 font-mono text-[11px]"
                 >
                   <div className="mt-0.5">{getStepBadge(step.stepType)}</div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-slate-200 leading-snug">{step.description}</p>
+                    <p className="text-zinc-200 leading-snug">{step.description}</p>
                     {step.toolResult && (
-                      <p className="text-[10px] text-slate-500 mt-1 truncate">
+                      <p className="text-[10px] text-zinc-500 mt-1 truncate">
                         ✓ {step.toolResult}
                       </p>
                     )}
@@ -179,8 +179,8 @@ export const AgentChatView: React.FC<AgentChatViewProps> = ({
               <div
                 className={`max-w-[92%] rounded-xl p-3 shadow-md ${
                   isAgent
-                    ? 'bg-slate-900 border border-slate-800 text-slate-200 rounded-tl-none'
-                    : 'bg-blue-600 text-white rounded-tr-none'
+                    ? 'bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-tl-none'
+                    : 'bg-white text-black font-medium rounded-tr-none'
                 }`}
               >
                 <div className="whitespace-pre-wrap leading-relaxed font-sans text-xs">
@@ -189,20 +189,20 @@ export const AgentChatView: React.FC<AgentChatViewProps> = ({
 
                 {/* Diff inspection CTA */}
                 {isAgent && msg.diffSummary && (
-                  <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-emerald-400">
+                  <div className="mt-2.5 pt-2 border-t border-zinc-800 flex items-center justify-between">
+                    <span className="text-[10px] font-mono text-zinc-300">
                       {msg.diffSummary}
                     </span>
                     <button
                       onClick={() => onOpenDiff()}
-                      className="px-2 py-1 rounded bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-mono text-[10px] flex items-center gap-1 transition-colors"
+                      className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-white font-mono text-[10px] flex items-center gap-1 transition-colors border border-zinc-700"
                     >
                       <GitCompare className="w-3 h-3" /> Inspect Diff →
                     </button>
                   </div>
                 )}
               </div>
-              <span className="text-[9px] font-mono text-slate-600 mt-1 px-1">
+              <span className="text-[9px] font-mono text-zinc-500 mt-1 px-1">
                 {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
@@ -213,15 +213,15 @@ export const AgentChatView: React.FC<AgentChatViewProps> = ({
 
       {/* Suggestion Prompts Chips */}
       {messages.length <= 2 && (
-        <div className="p-2 border-t border-slate-900 bg-slate-950 space-y-1">
-          <div className="text-[10px] font-mono text-slate-500 uppercase px-1">Suggested prompts:</div>
+        <div className="p-2 border-t border-zinc-900 bg-zinc-950 space-y-1">
+          <div className="text-[10px] font-mono text-zinc-500 uppercase px-1">Suggested prompts:</div>
           <div className="space-y-1">
             {suggestionPrompts.map((sug, i) => (
               <button
                 key={i}
                 onClick={() => handleSuggestionClick(sug)}
                 disabled={isAgentRunning}
-                className="w-full text-left p-1.5 rounded bg-slate-900/80 hover:bg-slate-900 border border-slate-800/80 text-slate-300 hover:text-white text-[11px] font-sans truncate transition-colors disabled:opacity-50"
+                className="w-full text-left p-1.5 rounded bg-zinc-900/80 hover:bg-zinc-900 border border-zinc-800/80 text-zinc-300 hover:text-white text-[11px] font-sans truncate transition-colors disabled:opacity-50"
               >
                 ⚡ {sug}
               </button>
@@ -231,7 +231,7 @@ export const AgentChatView: React.FC<AgentChatViewProps> = ({
       )}
 
       {/* Prompt Input Form */}
-      <form onSubmit={handleSubmit} className="p-3 bg-slate-900 border-t border-slate-800/80">
+      <form onSubmit={handleSubmit} className="p-3 bg-zinc-900 border-t border-zinc-800/80">
         <div className="relative">
           <textarea
             value={inputPrompt}
@@ -245,13 +245,13 @@ export const AgentChatView: React.FC<AgentChatViewProps> = ({
             placeholder="Ask agent to modify code, fix build errors, or build features..."
             rows={2}
             disabled={isAgentRunning}
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 pr-9 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none font-sans"
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 pr-10 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 resize-none font-sans"
             id="agent-chat-prompt-input"
           />
           <button
             type="submit"
             disabled={!inputPrompt.trim() || isAgentRunning}
-            className="absolute right-2 bottom-2.5 p-1.5 rounded-md bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 text-white disabled:text-slate-600 transition-colors shadow-md"
+            className="absolute right-2 bottom-2.5 p-2 rounded-md bg-white hover:bg-zinc-200 disabled:bg-zinc-800 text-black disabled:text-zinc-600 transition-colors shadow-md"
             title="Dispatch prompt to agent"
             id="btn-send-agent-prompt"
           >
