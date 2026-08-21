@@ -1,264 +1,375 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Sparkles,
   Send,
-  GitCompare,
+  Sparkles,
+  Paperclip,
+  Image as ImageIcon,
+  FileCode,
+  FileArchive,
+  X,
   CheckCircle2,
   AlertCircle,
   Clock,
-  Code2,
-  Terminal,
-  Cpu,
-  Layers,
   ChevronDown,
-  ChevronUp,
-  FileCode,
-  ShieldCheck
+  ChevronRight,
+  RefreshCw,
+  Square,
+  Bot,
+  User as UserIcon,
+  Route,
+  Zap,
+  ArrowUp
 } from 'lucide-react';
-import { AgentStepEntity, ConversationMessageEntity } from '../../types';
-import { Badge } from '../common/Badge';
+import {
+  ChatMessageEntity,
+  AgentExecutionStep,
+  AttachmentPayload
+} from '../../types';
 
 interface AgentChatViewProps {
-  messages: ConversationMessageEntity[];
-  steps: AgentStepEntity[];
+  messages: ChatMessageEntity[];
+  currentSteps: AgentExecutionStep[];
   isAgentRunning: boolean;
-  currentRunningStep: string;
-  onSendMessage: (prompt: string) => void;
-  onOpenDiff: (targetPath?: string) => void;
-  activeRouteName: string;
+  onSendMessage: (content: string, attachments: AttachmentPayload[]) => void;
+  onStopAgent: () => void;
+  activeModelName: string;
 }
 
 export const AgentChatView: React.FC<AgentChatViewProps> = ({
   messages,
-  steps,
+  currentSteps,
   isAgentRunning,
-  currentRunningStep,
   onSendMessage,
-  onOpenDiff,
-  activeRouteName
+  onStopAgent,
+  activeModelName
 }) => {
-  const [inputPrompt, setInputPrompt] = useState('');
-  const [showStepsList, setShowStepsList] = useState(true);
+  const [inputText, setInputText] = useState('');
+  const [attachments, setAttachments] = useState<AttachmentPayload[]>([]);
+  const [showAttachMenu, setShowAttachMenu] = useState(false);
+  const [expandedStepIds, setExpandedStepIds] = useState<Record<string, boolean>>({});
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const suggestionPrompts = [
-    'Enhance the hero section with a gradient glow and dynamic metrics',
-    'Add an interactive project showcase grid to the portfolio',
-    'Refactor ContactForm with phone validation and error feedback',
-    'Run full build verification and Jest unit tests'
-  ];
-
+  // Auto-scroll on new messages or steps
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, steps, currentRunningStep]);
+  }, [messages, currentSteps]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (inputPrompt.trim() && !isAgentRunning) {
-      onSendMessage(inputPrompt.trim());
-      setInputPrompt('');
+  const handleSend = () => {
+    if (!inputText.trim() && attachments.length === 0) return;
+    if (isAgentRunning) return;
+
+    onSendMessage(inputText.trim(), attachments);
+    setInputText('');
+    setAttachments([]);
+    setShowAttachMenu(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
-  const handleSuggestionClick = (prompt: string) => {
-    if (!isAgentRunning) {
-      onSendMessage(prompt);
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'file' | 'zip') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      setAttachments((prev) => [
+        ...prev,
+        {
+          name: file.name,
+          type,
+          size: file.size,
+          content
+        }
+      ]);
+    };
+
+    if (type === 'image') {
+      reader.readAsDataURL(file);
+    } else {
+      reader.readAsText(file);
     }
+
+    setShowAttachMenu(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const getStepBadge = (type: string) => {
-    switch (type) {
-      case 'PLAN':
-        return <Badge text="PLAN" variant="white" />;
-      case 'INSPECT':
-        return <Badge text="INSPECT" variant="inverted" />;
-      case 'READ_FILE':
-        return <Badge text="READ" variant="subtle" />;
-      case 'CREATE_FILE':
-      case 'EDIT_FILE':
-        return <Badge text="WRITE" variant="white" />;
-      case 'RUN_BUILD':
-        return <Badge text="BUILD" variant="inverted" />;
-      case 'RUN_TEST':
-        return <Badge text="TEST" variant="white" />;
-      case 'VERIFIED':
-        return <Badge text="VERIFIED" variant="inverted" />;
-      default:
-        return <Badge text={type} variant="subtle" />;
-    }
+  const removeAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const toggleStepDetails = (stepId: string) => {
+    setExpandedStepIds((prev) => ({ ...prev, [stepId]: !prev[stepId] }));
   };
 
   return (
-    <div className="h-full flex flex-col bg-zinc-950 border-l border-zinc-800/80 select-none text-xs">
-      {/* Agent Header */}
-      <div className="p-3 bg-zinc-900 border-b border-zinc-800/80 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-white text-black flex items-center justify-center shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-black" />
-          </div>
-          <div>
-            <div className="font-bold font-mono text-zinc-100 flex items-center gap-1.5">
-              Coding Agent
-              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+    <div className="h-full flex flex-col justify-between bg-zinc-950/90 font-mono text-xs select-none">
+      {/* Messages Stream Container */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 && currentSteps.length === 0 ? (
+          <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400">
+              <Sparkles className="w-5 h-5 text-zinc-300" />
             </div>
-            <div className="text-[10px] text-zinc-400 font-mono truncate max-w-[170px]">
-              Route: {activeRouteName || 'NVIDIA NIM DeepSeek'}
+            <div>
+              <h3 className="text-sm font-bold text-white mb-1">Autonomous Coding Agent</h3>
+              <p className="text-xs text-zinc-400 max-w-sm mx-auto font-sans leading-relaxed">
+                Describe a feature, refactor code, or attach screenshots. The agent plans, modifies files, and verifies builds automatically.
+              </p>
             </div>
           </div>
-        </div>
-
-        {isAgentRunning && (
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-800 text-white border border-zinc-700 text-[10px] font-mono animate-pulse">
-            <Cpu className="w-3 h-3" /> Working
-          </span>
-        )}
-      </div>
-
-      {/* Active Autonomous Step Progression Card */}
-      {isAgentRunning && (
-        <div className="p-3 bg-zinc-900 border-b border-zinc-800">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-mono text-white font-semibold uppercase flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-white animate-ping" />
-              Autonomous Execution Loop
-            </span>
-            <span className="text-[10px] font-mono text-zinc-400">Step {steps.length + 1}/7</span>
-          </div>
-          <div className="p-2 rounded bg-zinc-950 border border-zinc-800 font-mono text-zinc-200 text-[11px] leading-tight">
-            {currentRunningStep || 'Initializing agent tools & inspecting files...'}
-          </div>
-        </div>
-      )}
-
-      {/* Live Steps Breakdown Accordion */}
-      {steps.length > 0 && (
-        <div className="border-b border-zinc-800/80 bg-zinc-900/50">
-          <button
-            onClick={() => setShowStepsList(!showStepsList)}
-            className="w-full px-3 py-1.5 flex items-center justify-between text-zinc-400 hover:text-zinc-200 text-[11px] font-mono"
-          >
-            <span className="flex items-center gap-1">
-              <Layers className="w-3 h-3 text-zinc-300" />
-              Execution Steps ({steps.length})
-            </span>
-            {showStepsList ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-          </button>
-
-          {showStepsList && (
-            <div className="max-h-48 overflow-y-auto p-2 space-y-1.5 border-t border-zinc-900">
-              {steps.map((step, idx) => (
-                <div
-                  key={step.id || idx}
-                  className="p-2 rounded bg-zinc-950 border border-zinc-800/80 flex items-start gap-2 font-mono text-[11px]"
-                >
-                  <div className="mt-0.5">{getStepBadge(step.stepType)}</div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-zinc-200 leading-snug">{step.description}</p>
-                    {step.toolResult && (
-                      <p className="text-[10px] text-zinc-500 mt-1 truncate">
-                        ✓ {step.toolResult}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Messages Thread */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-3">
-        {messages.map((msg) => {
-          const isAgent = msg.sender === 'AGENT';
-          return (
-            <div
-              key={msg.id}
-              className={`flex flex-col ${isAgent ? 'items-start' : 'items-end'}`}
-            >
+        ) : (
+          <>
+            {messages.map((msg) => (
               <div
-                className={`max-w-[92%] rounded-xl p-3 shadow-md ${
-                  isAgent
-                    ? 'bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-tl-none'
-                    : 'bg-white text-black font-medium rounded-tr-none'
+                key={msg.id}
+                className={`flex gap-3 text-left ${
+                  msg.sender === 'user' ? 'justify-end' : 'justify-start'
                 }`}
               >
-                <div className="whitespace-pre-wrap leading-relaxed font-sans text-xs">
-                  {msg.content}
+                {msg.sender === 'assistant' && (
+                  <div className="w-6 h-6 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0 mt-0.5">
+                    <Bot className="w-3.5 h-3.5 text-white" />
+                  </div>
+                )}
+
+                <div
+                  className={`max-w-[85%] rounded-xl p-3 space-y-2 leading-relaxed ${
+                    msg.sender === 'user'
+                      ? 'bg-zinc-800 border border-zinc-700 text-zinc-100 font-sans'
+                      : 'bg-zinc-900/90 border border-zinc-800 text-zinc-200 font-sans'
+                  }`}
+                >
+                  {/* Attachments pills in message */}
+                  {msg.attachments && msg.attachments.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pb-1">
+                      {msg.attachments.map((att, i) => (
+                        <div
+                          key={i}
+                          className="px-2 py-0.5 rounded bg-zinc-950/80 border border-zinc-700 text-[10px] text-zinc-300 flex items-center gap-1 font-mono"
+                        >
+                          {att.type === 'image' ? (
+                            <ImageIcon className="w-3 h-3 text-zinc-400" />
+                          ) : (
+                            <FileCode className="w-3 h-3 text-zinc-400" />
+                          )}
+                          <span>{att.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="whitespace-pre-wrap text-xs">{msg.content}</div>
+
+                  {/* If message has embedded execution steps */}
+                  {msg.steps && msg.steps.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-zinc-800/80 space-y-1 font-mono text-[11px]">
+                      {msg.steps.map((st) => (
+                        <div key={st.id} className="flex items-center gap-2 text-zinc-400">
+                          {st.status === 'SUCCESS' ? (
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          ) : st.status === 'ERROR' ? (
+                            <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                          ) : (
+                            <Clock className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                          )}
+                          <span className="text-zinc-300">{st.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                {/* Diff inspection CTA */}
-                {isAgent && msg.diffSummary && (
-                  <div className="mt-2.5 pt-2 border-t border-zinc-800 flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-zinc-300">
-                      {msg.diffSummary}
-                    </span>
-                    <button
-                      onClick={() => onOpenDiff()}
-                      className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-white font-mono text-[10px] flex items-center gap-1 transition-colors border border-zinc-700"
-                    >
-                      <GitCompare className="w-3 h-3" /> Inspect Diff →
-                    </button>
+                {msg.sender === 'user' && (
+                  <div className="w-6 h-6 rounded-lg bg-white text-black font-bold flex items-center justify-center shrink-0 mt-0.5 text-xs font-mono">
+                    U
                   </div>
                 )}
               </div>
-              <span className="text-[9px] font-mono text-zinc-500 mt-1 px-1">
-                {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            </div>
-          );
-        })}
-        <div ref={messagesEndRef} />
+            ))}
+
+            {/* Active Live Agent Execution Card */}
+            {isAgentRunning && currentSteps.length > 0 && (
+              <div className="p-3.5 rounded-xl border border-zinc-700/80 bg-zinc-900/90 shadow-xl space-y-2.5 font-mono">
+                <div className="flex items-center justify-between pb-2 border-b border-zinc-800 text-[11px]">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                    <span className="text-white font-bold">AGENT EXECUTION</span>
+                    <span className="text-zinc-400">• {activeModelName}</span>
+                  </div>
+                  <button
+                    onClick={onStopAgent}
+                    className="px-2 py-0.5 rounded bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 text-[10px] flex items-center gap-1 transition-colors"
+                  >
+                    <Square className="w-2.5 h-2.5 fill-current" />
+                    <span>Stop</span>
+                  </button>
+                </div>
+
+                <div className="space-y-1.5 text-xs">
+                  {currentSteps.map((step) => {
+                    const isExpanded = expandedStepIds[step.id];
+                    return (
+                      <div key={step.id} className="space-y-1">
+                        <div
+                          onClick={() => step.details && toggleStepDetails(step.id)}
+                          className={`flex items-center justify-between p-1.5 rounded-lg transition-colors ${
+                            step.details ? 'cursor-pointer hover:bg-zinc-800/80' : ''
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            {step.status === 'IN_PROGRESS' ? (
+                              <RefreshCw className="w-3.5 h-3.5 text-emerald-400 animate-spin shrink-0" />
+                            ) : step.status === 'SUCCESS' ? (
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            ) : step.status === 'ERROR' ? (
+                              <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                            ) : (
+                              <Clock className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                            )}
+                            <span
+                              className={`truncate ${
+                                step.status === 'IN_PROGRESS'
+                                  ? 'text-emerald-300 font-bold'
+                                  : 'text-zinc-300'
+                              }`}
+                            >
+                              {step.title}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0 text-[10px] text-zinc-400">
+                            {step.elapsedMs && <span>{(step.elapsedMs / 1000).toFixed(1)}s</span>}
+                            {step.details && (
+                              isExpanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Collapsible Step Logs */}
+                        {isExpanded && step.details && (
+                          <pre className="p-2 ml-5 rounded bg-zinc-950 border border-zinc-800 text-[10px] text-zinc-400 whitespace-pre-wrap overflow-x-auto">
+                            {step.details}
+                          </pre>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </>
+        )}
       </div>
 
-      {/* Suggestion Prompts Chips */}
-      {messages.length <= 2 && (
-        <div className="p-2 border-t border-zinc-900 bg-zinc-950 space-y-1">
-          <div className="text-[10px] font-mono text-zinc-500 uppercase px-1">Suggested prompts:</div>
-          <div className="space-y-1">
-            {suggestionPrompts.map((sug, i) => (
-              <button
-                key={i}
-                onClick={() => handleSuggestionClick(sug)}
-                disabled={isAgentRunning}
-                className="w-full text-left p-1.5 rounded bg-zinc-900/80 hover:bg-zinc-900 border border-zinc-800/80 text-zinc-300 hover:text-white text-[11px] font-sans truncate transition-colors disabled:opacity-50"
+      {/* Input Composer Box */}
+      <div className="p-3 border-t border-zinc-800/80 bg-zinc-950 space-y-2">
+        {/* Attachment Pills Preview */}
+        {attachments.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pb-1">
+            {attachments.map((att, index) => (
+              <div
+                key={index}
+                className="px-2 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-300 flex items-center gap-1.5"
               >
-                ⚡ {sug}
-              </button>
+                {att.type === 'image' ? (
+                  <ImageIcon className="w-3 h-3 text-zinc-400" />
+                ) : (
+                  <FileCode className="w-3 h-3 text-zinc-400" />
+                )}
+                <span className="truncate max-w-[140px]">{att.name}</span>
+                <button
+                  type="button"
+                  onClick={() => removeAttachment(index)}
+                  className="text-zinc-400 hover:text-white"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Prompt Input Form */}
-      <form onSubmit={handleSubmit} className="p-3 bg-zinc-900 border-t border-zinc-800/80">
-        <div className="relative">
+        {/* Input Area */}
+        <div className="relative rounded-xl border border-zinc-800 bg-zinc-900/60 focus-within:border-zinc-600 transition-colors">
           <textarea
-            value={inputPrompt}
-            onChange={(e) => setInputPrompt(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-            placeholder="Ask agent to modify code, fix build errors, or build features..."
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask your AI coding agent (e.g. 'Add dark mode toggle to Navbar')..."
             rows={2}
-            disabled={isAgentRunning}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 pr-10 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 resize-none font-sans"
-            id="agent-chat-prompt-input"
+            className="w-full bg-transparent px-3 py-2.5 text-xs text-white placeholder:text-zinc-400 focus:outline-none resize-none font-sans leading-relaxed"
+            id="agent-chat-textarea"
           />
-          <button
-            type="submit"
-            disabled={!inputPrompt.trim() || isAgentRunning}
-            className="absolute right-2 bottom-2.5 p-2 rounded-md bg-white hover:bg-zinc-200 disabled:bg-zinc-800 text-black disabled:text-zinc-600 transition-colors shadow-md"
-            title="Dispatch prompt to agent"
-            id="btn-send-agent-prompt"
-          >
-            <Send className="w-3.5 h-3.5" />
-          </button>
+
+          {/* Bottom Toolbar inside input */}
+          <div className="px-2.5 pb-2 flex items-center justify-between text-zinc-400 text-xs">
+            <div className="flex items-center gap-1.5 relative">
+              {/* Attachment button */}
+              <button
+                type="button"
+                onClick={() => setShowAttachMenu(!showAttachMenu)}
+                className="p-1 rounded hover:text-white hover:bg-zinc-800 transition-colors"
+                title="Add attachment"
+                id="btn-chat-attach"
+              >
+                <Paperclip className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Attach Dropdown Menu */}
+              {showAttachMenu && (
+                <div className="absolute bottom-8 left-0 z-30 w-44 rounded-xl border border-zinc-800 bg-zinc-900 shadow-2xl p-1 font-mono text-[11px] space-y-0.5">
+                  <label className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-zinc-800 hover:text-white cursor-pointer text-zinc-300">
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>Upload Image</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(e, 'image')}
+                    />
+                  </label>
+                  <label className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-zinc-800 hover:text-white cursor-pointer text-zinc-300">
+                    <FileCode className="w-3.5 h-3.5" />
+                    <span>Upload File</span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(e, 'file')}
+                    />
+                  </label>
+                </div>
+              )}
+
+              {/* Active Route Pill */}
+              <span className="text-[10px] text-zinc-400 px-2 py-0.5 rounded bg-zinc-950 border border-zinc-800 truncate max-w-[160px]">
+                {activeModelName}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleSend}
+                disabled={(!inputText.trim() && attachments.length === 0) || isAgentRunning}
+                className="p-1.5 rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold transition-colors disabled:opacity-30 active:scale-95"
+                title="Send instruction (Enter)"
+                id="btn-chat-send"
+              >
+                <ArrowUp className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

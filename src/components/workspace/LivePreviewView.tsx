@@ -1,294 +1,237 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  Monitor,
-  Tablet,
-  Smartphone,
   RotateCcw,
   ExternalLink,
-  ShieldCheck,
-  Send,
+  Laptop,
+  Tablet,
+  Smartphone,
+  Terminal,
+  Activity,
+  AlertCircle,
   CheckCircle2,
-  Moon,
-  Sun,
-  Sparkles,
-  ArrowRight,
-  Code2,
-  Zap
+  ChevronDown,
+  ChevronUp,
+  Maximize2
 } from 'lucide-react';
 import { ProjectFileEntity } from '../../types';
 
 interface LivePreviewViewProps {
   files: ProjectFileEntity[];
   projectName: string;
+  framework: string;
 }
 
 export const LivePreviewView: React.FC<LivePreviewViewProps> = ({
   files,
-  projectName
+  projectName,
+  framework
 }) => {
-  const [deviceMode, setDeviceMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
-  const [isDark, setIsDark] = useState(true);
-  const [contactName, setContactName] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [contactMsg, setContactMsg] = useState('');
-  const [contactSent, setContactSent] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [viewportMode, setViewportMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showConsole, setShowConsole] = useState(false);
+  const [consoleLogs, setConsoleLogs] = useState<Array<{ type: 'log' | 'warn' | 'error'; text: string; time: string }>>([
+    { type: 'log', text: `[Vite] dev server running at http://localhost:3000/`, time: '12:00:01' },
+    { type: 'log', text: `[HMR] connected & listening for autonomous agent edits`, time: '12:00:02' }
+  ]);
+  const [previewKey, setPreviewKey] = useState(1);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Check if files contain customized content
-  const heroFile = files.find((f) => f.path === 'components/Hero.tsx');
-  const isEnhancedHero = heroFile?.content.includes('Enhanced Hero v2.0') || heroFile?.content.includes('Architecting Software');
+  // Generate rendered HTML from project files
+  const generatePreviewSrcDoc = () => {
+    // Find index.html or construct from files
+    const htmlFile = files.find((f) => f.path.endsWith('.html') || f.path === 'index.html');
+    const mainTsx = files.find((f) => f.path.includes('page.tsx') || f.path.includes('App.tsx') || f.path.includes('main.tsx'));
+    const cssFile = files.find((f) => f.path.endsWith('.css'));
 
-  const handleContactSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (contactName && contactEmail) {
-      setContactSent(true);
-      setTimeout(() => setContactSent(false), 4000);
-      setContactName('');
-      setContactEmail('');
-      setContactMsg('');
+    if (htmlFile) {
+      return htmlFile.content;
     }
+
+    // Default template representation
+    return `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <script src="https://cdn.tailwindcss.com"></script>
+          <style>
+            ${cssFile ? cssFile.content : ''}
+          </style>
+        </head>
+        <body class="bg-zinc-950 text-zinc-100 font-sans p-6 min-h-screen">
+          <div class="max-w-xl mx-auto py-12 text-center space-y-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900 text-zinc-300 text-xs font-mono">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Port 3000 • Live Sandbox</span>
+            </div>
+            
+            <h1 class="text-3xl font-bold font-mono text-white tracking-tight">
+              ${projectName}
+            </h1>
+            
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Autonomous application sandbox initialized. Use the Agent Chat to generate components, pages, and interactive features.
+            </p>
+
+            <div class="p-4 rounded-xl border border-zinc-800 bg-zinc-900/60 text-left font-mono text-xs space-y-2 text-zinc-300">
+              <div class="text-zinc-400 text-[10px] uppercase font-bold">Workspace Structure:</div>
+              <div class="space-y-1">
+                <div>📁 src/</div>
+                <div class="pl-4">📄 App.tsx (${mainTsx ? 'Modified' : 'Initial'})</div>
+                <div class="pl-4">📄 index.css</div>
+                <div>📁 components/</div>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
   };
 
-  const getContainerWidth = () => {
-    switch (deviceMode) {
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setPreviewKey((prev) => prev + 1);
+    setConsoleLogs((prev) => [
+      ...prev,
+      { type: 'log', text: `[Sandbox] Manual preview reload triggered`, time: new Date().toLocaleTimeString() }
+    ]);
+    setTimeout(() => setIsRefreshing(false), 400);
+  };
+
+  const getViewportWidth = () => {
+    switch (viewportMode) {
       case 'mobile':
-        return 'max-w-[375px]';
+        return 'w-[375px]';
       case 'tablet':
-        return 'max-w-[768px]';
+        return 'w-[768px]';
+      case 'desktop':
       default:
         return 'w-full';
     }
   };
 
   return (
-    <div className="h-full flex flex-col bg-zinc-950 text-zinc-100 select-none">
-      {/* Browser Frame Toolbar */}
-      <div className="h-11 bg-zinc-900 border-b border-zinc-800/80 px-3 md:px-4 flex items-center justify-between">
-        {/* Device Switcher */}
-        <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded-md border border-zinc-800">
+    <div className="h-full flex flex-col justify-between bg-zinc-950 border-l border-zinc-800/80 font-mono text-xs select-none">
+      {/* Top Browser Bar */}
+      <div className="h-11 px-3 border-b border-zinc-800/80 bg-zinc-950 flex items-center justify-between gap-2">
+        {/* Left: Refresh & URL Address Bar */}
+        <div className="flex items-center gap-2 flex-1 min-w-0">
           <button
-            onClick={() => setDeviceMode('desktop')}
-            className={`p-1.5 rounded ${
-              deviceMode === 'desktop' ? 'bg-white text-black font-bold' : 'text-zinc-400 hover:text-white'
+            onClick={handleRefresh}
+            className={`p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors ${
+              isRefreshing ? 'animate-spin text-emerald-400' : ''
             }`}
-            title="Desktop View (100%)"
-          >
-            <Monitor className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => setDeviceMode('tablet')}
-            className={`p-1.5 rounded ${
-              deviceMode === 'tablet' ? 'bg-white text-black font-bold' : 'text-zinc-400 hover:text-white'
-            }`}
-            title="Tablet View (768px)"
-          >
-            <Tablet className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => setDeviceMode('mobile')}
-            className={`p-1.5 rounded ${
-              deviceMode === 'mobile' ? 'bg-white text-black font-bold' : 'text-zinc-400 hover:text-white'
-            }`}
-            title="Mobile View (375px)"
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        {/* Address Bar */}
-        <div className="flex-1 max-w-md mx-2 sm:mx-4">
-          <div className="bg-zinc-950 border border-zinc-800 rounded-md px-3 py-1 text-xs font-mono text-zinc-400 flex items-center justify-between">
-            <div className="flex items-center gap-1.5 truncate">
-              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-              <span className="text-zinc-200">https://sandbox.ownai.dev/live/{projectName.toLowerCase().replace(/[^a-z0-9]/g, '-')}</span>
-            </div>
-            <ShieldCheck className="w-3.5 h-3.5 text-zinc-300 flex-shrink-0" />
-          </div>
-        </div>
-
-        {/* Refresh Button */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setRefreshKey((prev) => prev + 1)}
-            className="p-1.5 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
-            title="Reload Preview Container"
+            title="Reload preview"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
-        </div>
-      </div>
 
-      {/* Simulated Browser Content Canvas */}
-      <div className="flex-1 bg-zinc-950/60 p-2 sm:p-4 md:p-6 overflow-y-auto flex items-start justify-center">
-        <div
-          key={refreshKey}
-          className={`${getContainerWidth()} w-full transition-all duration-300 rounded-xl overflow-hidden shadow-2xl border ${
-            isDark ? 'border-zinc-800 bg-zinc-900 text-zinc-100' : 'border-zinc-300 bg-white text-zinc-900'
-          }`}
-        >
-          {/* Internal Navbar */}
-          <header className={`px-5 py-3.5 border-b flex items-center justify-between ${
-            isDark ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-200 bg-zinc-50'
-          }`}>
-            <div className="flex items-center gap-2 font-mono font-bold tracking-tight">
-              <span className="w-2.5 h-2.5 rounded-full bg-white" />
-              <span>{projectName || 'Jarvis Portfolio'}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsDark(!isDark)}
-                className={`p-1.5 rounded-lg border transition-colors ${
-                  isDark
-                    ? 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white'
-                    : 'border-zinc-300 bg-zinc-200 text-zinc-700 hover:text-black'
-                }`}
-                title="Toggle visual mode in preview"
-              >
-                {isDark ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-              </button>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-200 border border-zinc-700 font-semibold">
-                SANDBOX ACTIVE
-              </span>
-            </div>
-          </header>
-
-          {/* App Preview Body */}
-          <div className="p-5 md:p-8 space-y-8">
-            {/* Dynamic Hero Section */}
-            {isEnhancedHero ? (
-              <section className={`relative overflow-hidden rounded-xl border p-6 md:p-8 shadow-xl ${
-                isDark ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-200 bg-zinc-50'
-              }`}>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-700 bg-zinc-800 text-zinc-200 text-xs font-mono mb-4">
-                  <Zap className="w-3.5 h-3.5" />
-                  Enhanced Hero v2.0 • Ultra-Responsive Monochrome
-                </div>
-                
-                <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-4 leading-tight">
-                  Architecting Software with <span className="underline decoration-white decoration-2 underline-offset-4">Autonomous Precision</span>.
-                </h1>
-                
-                <p className={`text-xs md:text-sm max-w-xl mb-6 ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                  Full-stack distributed systems, reactive developer tooling, and self-hosted AI routing. Built for engineers who control their models, keys, and execution sandboxes.
-                </p>
-
-                {/* Metric Badges */}
-                <div className="grid grid-cols-3 gap-2.5 mb-6 max-w-md">
-                  <div className={`p-2.5 rounded-lg border text-center ${isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
-                    <div className="text-sm md:text-base font-bold font-mono text-white">0ms</div>
-                    <div className="text-[10px] text-zinc-400 font-mono">Leak Rate</div>
-                  </div>
-                  <div className={`p-2.5 rounded-lg border text-center ${isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
-                    <div className="text-sm md:text-base font-bold font-mono text-white">&lt; 150ms</div>
-                    <div className="text-[10px] text-zinc-400 font-mono">Failover</div>
-                  </div>
-                  <div className={`p-2.5 rounded-lg border text-center ${isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
-                    <div className="text-sm md:text-base font-bold font-mono text-white">100%</div>
-                    <div className="text-[10px] text-zinc-400 font-mono">Isolated venv</div>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2.5">
-                  <button className="px-4 py-2 rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-sm">
-                    Initiate Contact <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                  <button className={`px-4 py-2 rounded-lg border font-medium text-xs transition-colors flex items-center gap-1.5 ${
-                    isDark ? 'border-zinc-700 hover:bg-zinc-800 text-zinc-300' : 'border-zinc-300 hover:bg-zinc-100 text-zinc-700'
-                  }`}>
-                    <Code2 className="w-3.5 h-3.5" /> System Architecture
-                  </button>
-                </div>
-              </section>
-            ) : (
-              <section className={`rounded-xl border p-6 md:p-8 ${
-                isDark ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-200 bg-zinc-50'
-              }`}>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-zinc-700 bg-zinc-800 text-zinc-200 text-xs font-mono mb-4">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  OwnAI BYOK Autonomous Agent
-                </div>
-                
-                <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-3">
-                  Building software with autonomous intelligence.
-                </h1>
-                
-                <p className={`text-xs md:text-sm max-w-lg mb-6 ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                  Senior Engineer crafting resilient distributed architectures & reactive developer tooling.
-                </p>
-                
-                <div className="flex gap-3">
-                  <button className="px-4 py-2 rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold text-xs shadow-sm">
-                    Get in Touch
-                  </button>
-                </div>
-              </section>
-            )}
-
-            {/* Interactive Contact Form */}
-            <section className={`rounded-xl border p-5 md:p-6 ${
-              isDark ? 'border-zinc-800 bg-zinc-950' : 'border-zinc-200 bg-zinc-50'
-            }`}>
-              <h2 className="text-base font-bold mb-1">Initiate Direct Transmission</h2>
-              <p className={`text-xs mb-4 ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
-                Leave your coordinates for collaboration inquiries.
-              </p>
-
-              {contactSent ? (
-                <div className="flex items-center gap-2 p-3.5 rounded-lg bg-zinc-800 border border-zinc-700 text-white text-xs">
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                  <span>Message verified and transmitted to sandbox queue!</span>
-                </div>
-              ) : (
-                <form onSubmit={handleContactSubmit} className="space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input
-                      type="text"
-                      value={contactName}
-                      onChange={(e) => setContactName(e.target.value)}
-                      placeholder="Developer Name"
-                      required
-                      className={`w-full px-3 py-2 rounded-lg border text-xs focus:outline-none ${
-                        isDark
-                          ? 'bg-zinc-900 border-zinc-800 text-zinc-200 placeholder-zinc-600 focus:border-white'
-                          : 'bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400 focus:border-black'
-                      }`}
-                    />
-                    <input
-                      type="email"
-                      value={contactEmail}
-                      onChange={(e) => setContactEmail(e.target.value)}
-                      placeholder="developer@domain.com"
-                      required
-                      className={`w-full px-3 py-2 rounded-lg border text-xs focus:outline-none ${
-                        isDark
-                          ? 'bg-zinc-900 border-zinc-800 text-zinc-200 placeholder-zinc-600 focus:border-white'
-                          : 'bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400 focus:border-black'
-                      }`}
-                    />
-                  </div>
-                  <textarea
-                    value={contactMsg}
-                    onChange={(e) => setContactMsg(e.target.value)}
-                    placeholder="Project requirements..."
-                    rows={2}
-                    className={`w-full px-3 py-2 rounded-lg border text-xs resize-none focus:outline-none ${
-                      isDark
-                        ? 'bg-zinc-900 border-zinc-800 text-zinc-200 placeholder-zinc-600 focus:border-white'
-                        : 'bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400 focus:border-black'
-                    }`}
-                  />
-                  <button
-                    type="submit"
-                    className="w-full py-2 bg-white hover:bg-zinc-200 text-black font-semibold rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm"
-                  >
-                    <Send className="w-3.5 h-3.5" /> Transmit Message
-                  </button>
-                </form>
-              )}
-            </section>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px] text-zinc-300 flex-1 max-w-sm truncate">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="truncate">localhost:3000/</span>
           </div>
         </div>
+
+        {/* Right: Viewport Mode Toggles & Console Toggle */}
+        <div className="flex items-center gap-1">
+          <div className="hidden sm:flex items-center gap-0.5 p-0.5 rounded-lg bg-zinc-900 border border-zinc-800">
+            <button
+              onClick={() => setViewportMode('desktop')}
+              className={`p-1 rounded ${
+                viewportMode === 'desktop' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'
+              }`}
+              title="Desktop (100%)"
+            >
+              <Laptop className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setViewportMode('tablet')}
+              className={`p-1 rounded ${
+                viewportMode === 'tablet' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'
+              }`}
+              title="Tablet (768px)"
+            >
+              <Tablet className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setViewportMode('mobile')}
+              className={`p-1 rounded ${
+                viewportMode === 'mobile' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'
+              }`}
+              title="Mobile (375px)"
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <button
+            onClick={() => setShowConsole(!showConsole)}
+            className={`px-2 py-1 rounded-lg border text-[10px] flex items-center gap-1 transition-colors ${
+              showConsole
+                ? 'border-zinc-700 bg-zinc-800 text-white'
+                : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white'
+            }`}
+            title="Toggle Console Logs"
+          >
+            <Terminal className="w-3 h-3" />
+            <span>Logs</span>
+          </button>
+        </div>
       </div>
+
+      {/* Rendered Sandbox Viewport */}
+      <div className="flex-1 bg-zinc-900/40 p-2 sm:p-4 flex items-center justify-center overflow-auto">
+        <div
+          className={`${getViewportWidth()} h-full transition-all duration-200 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 shadow-2xl flex flex-col`}
+        >
+          <iframe
+            key={previewKey}
+            ref={iframeRef}
+            srcDoc={generatePreviewSrcDoc()}
+            title="Autonomous Project Preview"
+            className="w-full h-full border-0 bg-zinc-950"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-modals"
+          />
+        </div>
+      </div>
+
+      {/* Console Logs Drawer */}
+      {showConsole && (
+        <div className="h-40 border-t border-zinc-800 bg-zinc-950 p-3 flex flex-col font-mono text-[11px]">
+          <div className="flex items-center justify-between pb-2 border-b border-zinc-800 text-zinc-400 text-[10px]">
+            <div className="flex items-center gap-1.5">
+              <Terminal className="w-3 h-3" />
+              <span>CONTAINER CONSOLE OUTPUT</span>
+            </div>
+            <button
+              onClick={() => setConsoleLogs([])}
+              className="hover:text-white transition-colors"
+            >
+              Clear
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto pt-2 space-y-1 text-zinc-300">
+            {consoleLogs.map((log, idx) => (
+              <div key={idx} className="flex items-start gap-2">
+                <span className="text-zinc-400 text-[10px]">{log.time}</span>
+                <span
+                  className={
+                    log.type === 'error'
+                      ? 'text-red-400'
+                      : log.type === 'warn'
+                      ? 'text-amber-400'
+                      : 'text-zinc-300'
+                  }
+                >
+                  {log.text}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

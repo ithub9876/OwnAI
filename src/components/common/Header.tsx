@@ -162,9 +162,18 @@ export const Header: React.FC<HeaderProps> = ({
               className="flex items-center gap-2 pl-1.5 pr-2.5 sm:pl-2 sm:pr-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors"
               id="btn-user-profile"
             >
-              <div className="w-5 h-5 rounded-full bg-white text-[10px] font-bold text-black flex items-center justify-center">
-                {user.displayName.charAt(0)}
-              </div>
+              {user.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt={user.displayName}
+                  className="w-5 h-5 rounded-full object-cover border border-zinc-700"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-5 h-5 rounded-full bg-white text-[10px] font-bold text-black flex items-center justify-center">
+                  {user.displayName.charAt(0).toUpperCase()}
+                </div>
+              )}
               <span className="text-xs font-medium text-zinc-200 hidden sm:inline max-w-[90px] truncate">
                 {user.displayName}
               </span>
@@ -268,12 +277,21 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="pt-4 border-t border-zinc-900 flex items-center justify-between">
             {user ? (
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">
-                  {user.displayName.charAt(0)}
-                </div>
-                <div>
-                  <div className="text-xs font-medium text-white">{user.displayName}</div>
-                  <div className="text-[10px] text-zinc-400 font-mono">{user.email}</div>
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName}
+                    className="w-8 h-8 rounded-full object-cover border border-zinc-700"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">
+                    {user.displayName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="overflow-hidden">
+                  <div className="text-xs font-medium text-white truncate max-w-[180px]">{user.displayName}</div>
+                  <div className="text-[10px] text-zinc-400 font-mono truncate max-w-[180px]">{user.email}</div>
                 </div>
               </div>
             ) : (

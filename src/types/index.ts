@@ -32,6 +32,7 @@ export interface AiRouteEntity {
   supportsVision: boolean;
   supportsTools: boolean;
   isEnabled: boolean;
+  isPreferred?: boolean;
 }
 
 export interface ProjectEntity {
@@ -82,8 +83,10 @@ export interface ConversationMessageEntity {
   taskId?: string;
   sender: MessageSender;
   content: string;
-  diffSummary: string;
+  diffSummary?: string;
   timestamp: number;
+  attachments?: string[];
+  steps?: AgentStepEntity[];
 }
 
 export type AgentStepType =
@@ -174,15 +177,53 @@ export type WorkspaceTab =
 
 export type AppScreen =
   | 'LANDING'
+  | 'DASHBOARD'
   | 'WORKSPACE'
   | 'ROUTING'
-  | 'PROJECTS'
+  | 'KEYS'
+  | 'MODELS'
   | 'SETTINGS'
   | 'AUTH';
+
+export type SettingsTab = 'general' | 'keys' | 'models' | 'routing' | 'account';
 
 export interface User {
   id: string;
   email: string;
   displayName: string;
   role: string;
+  photoURL?: string;
+  authProvider?: 'google' | 'password';
+}
+
+export interface AttachmentPayload {
+  name: string;
+  type: 'image' | 'file' | 'zip';
+  size: number;
+  content: string;
+}
+
+export interface AgentExecutionStep {
+  id: string;
+  title: string;
+  status: 'PENDING' | 'IN_PROGRESS' | 'SUCCESS' | 'ERROR';
+  elapsedMs?: number;
+  details?: string;
+}
+
+export interface ChatMessageEntity {
+  id: string;
+  sender: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp: number;
+  attachments?: AttachmentPayload[];
+  steps?: AgentExecutionStep[];
+  diffSummary?: string;
+}
+
+export interface TerminalCommandOutput {
+  id: string;
+  command: string;
+  output: string;
+  timestamp: number;
 }
