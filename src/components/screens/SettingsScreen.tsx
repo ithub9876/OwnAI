@@ -24,7 +24,9 @@ import {
   RefreshCw,
   Search,
   Check,
-  Play
+  Play,
+  Users,
+  BookOpen
 } from 'lucide-react';
 import {
   SettingsTab,
@@ -41,6 +43,8 @@ import {
   ModelCatalogItem
 } from '../../lib/modelsCatalog';
 import { aiRouter } from '../../lib/aiRouter';
+import { AiTeamSettingsView } from './AiTeamSettingsView';
+import { SkillsSettingsView } from './SkillsSettingsView';
 
 interface SettingsScreenProps {
   initialTab?: SettingsTab;
@@ -216,6 +220,32 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           </button>
 
           <button
+            onClick={() => setActiveTab('ai-team')}
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-colors ${
+              activeTab === 'ai-team'
+                ? 'bg-zinc-800 text-white font-medium shadow-sm'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
+            }`}
+            id="tab-settings-ai-team"
+          >
+            <Users className="w-4 h-4 shrink-0" />
+            <span>AI Team (12 Roles)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('skills')}
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-colors ${
+              activeTab === 'skills'
+                ? 'bg-zinc-800 text-white font-medium shadow-sm'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
+            }`}
+            id="tab-settings-skills"
+          >
+            <BookOpen className="w-4 h-4 shrink-0" />
+            <span>Skills (19 Skills)</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('keys')}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left transition-colors ${
               activeTab === 'keys'
@@ -358,6 +388,19 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 </button>
               </div>
             </div>
+          )}
+
+          {/* TAB: AI TEAM (12 ROLES) */}
+          {activeTab === 'ai-team' && (
+            <AiTeamSettingsView
+              apiKeys={apiKeys}
+              aiRoutes={aiRoutes}
+            />
+          )}
+
+          {/* TAB: SKILLS (19 SKILLS) */}
+          {activeTab === 'skills' && (
+            <SkillsSettingsView />
           )}
 
           {/* TAB: API KEYS (BYOK) */}

@@ -185,7 +185,7 @@ export type AppScreen =
   | 'SETTINGS'
   | 'AUTH';
 
-export type SettingsTab = 'general' | 'keys' | 'models' | 'routing' | 'account';
+export type SettingsTab = 'general' | 'ai-team' | 'skills' | 'keys' | 'models' | 'routing' | 'account';
 
 export interface User {
   id: string;

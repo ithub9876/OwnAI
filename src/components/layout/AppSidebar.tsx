@@ -15,7 +15,9 @@ import {
   LogOut,
   ChevronRight,
   ExternalLink,
-  X
+  X,
+  Users,
+  BookOpen
 } from 'lucide-react';
 import { AppScreen, SettingsTab, ProjectEntity, User as UserType } from '../../types';
 
@@ -123,6 +125,26 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                 AI &amp; Models
               </div>
             )}
+
+            <button
+              onClick={() => onNavigate('SETTINGS', 'ai-team')}
+              className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-mono transition-colors text-zinc-400 hover:text-white hover:bg-zinc-900/60"
+              title="Specialized AI Team (12 Roles)"
+              id="nav-ai-team"
+            >
+              <Users className="w-4 h-4 shrink-0" />
+              {!isCollapsed && <span>AI Team</span>}
+            </button>
+
+            <button
+              onClick={() => onNavigate('SETTINGS', 'skills')}
+              className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-mono transition-colors text-zinc-400 hover:text-white hover:bg-zinc-900/60"
+              title="Skill Library (19 Skills)"
+              id="nav-skills"
+            >
+              <BookOpen className="w-4 h-4 shrink-0" />
+              {!isCollapsed && <span>Skills</span>}
+            </button>
 
             <button
               onClick={() => onNavigate('SETTINGS', 'keys')}
